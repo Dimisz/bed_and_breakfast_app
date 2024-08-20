@@ -6,22 +6,45 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/Dimisz/bed_and_breakfast_app/pkg/config"
+	"github.com/Dimisz/bed_and_breakfast_app/pkg/models"
 )
 
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	// create a template cache
-	templateCache, err := createTemplateCache()
-	if err != nil {
-		log.Fatal(err)
+var app *config.AppConfig
+
+// sets the config for the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
+
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
+	var templateCache map[string]*template.Template
+	var err error
+
+	if app.UseCache {
+		// get template cache from the app config
+		templateCache = app.TemplateCache
+	} else {
+		templateCache, err = CreateTemplateCache()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
 	// get requested template from cache
 	t, ok := templateCache[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("could not get template from template cache")
 	}
 
 	buf := new(bytes.Buffer)
-	err = t.Execute(buf, nil)
+	td = AddDefaultData(td)
+	err = t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
@@ -32,7 +55,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	}
 }
 
-func createTemplateCache() (map[string]*template.Template, error) {
+func CreateTemplateCache() (map[string]*template.Template, error) {
 	cachedTemplates := make(map[string]*template.Template)
 
 	// get all of the files names *.page.html from ./templates
