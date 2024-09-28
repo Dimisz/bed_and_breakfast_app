@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Dimisz/bed_and_breakfast_app/pkg/config"
-	"github.com/Dimisz/bed_and_breakfast_app/pkg/handlers"
-	"github.com/Dimisz/bed_and_breakfast_app/pkg/render"
+	"github.com/Dimisz/bed_and_breakfast_app/internal/config"
+	"github.com/Dimisz/bed_and_breakfast_app/internal/handlers"
+	"github.com/Dimisz/bed_and_breakfast_app/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
 
-const PORT string = ":8080"
+const PORT string = ":8081"
 
 var app config.AppConfig
 var session *scs.SessionManager
